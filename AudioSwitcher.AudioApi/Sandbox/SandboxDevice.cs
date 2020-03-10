@@ -66,14 +66,14 @@ namespace AudioSwitcher.AudioApi.Sandbox
             _controller = controller;
         }
 
-        public override bool SetAsDefault(CancellationToken cancellationToken)
+        public override bool SetAsDefault(Role role, CancellationToken cancellationToken)
         {
             _controller.SetDefaultDevice(this);
 
             return IsDefaultDevice;
         }
 
-        public override Task<bool> SetAsDefaultAsync(CancellationToken cancellationToken)
+        public override Task<bool> SetAsDefaultAsync(Role role, CancellationToken cancellationToken)
         {
             _controller.SetDefaultDevice(this);
 

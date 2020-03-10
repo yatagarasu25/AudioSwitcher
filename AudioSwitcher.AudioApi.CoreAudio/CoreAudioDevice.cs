@@ -295,15 +295,15 @@ namespace AudioSwitcher.AudioApi.CoreAudio
             return _volume;
         }
 
-        public override bool SetAsDefault()
+        public override bool SetAsDefault(Role role)
         {
             var cts = new CancellationTokenSource();
             cts.CancelAfter(DefaultComTimeout);
 
-            return SetAsDefault(cts.Token);
+            return SetAsDefault(role, cts.Token);
         }
 
-        public override bool SetAsDefault(CancellationToken cancellationToken)
+        public override bool SetAsDefault(Role role, CancellationToken cancellationToken)
         {
             if (State != DeviceState.Active)
                 return _isDefaultDevice = false;
@@ -315,7 +315,7 @@ namespace AudioSwitcher.AudioApi.CoreAudio
                 if (acquiredSemaphore)
                 {
                     _defaultResetEvent.Reset();
-                    PolicyConfig.SetDefaultEndpoint(RealId, ERole.Console | ERole.Multimedia);
+                    PolicyConfig.SetDefaultEndpoint(RealId, (ERole)role);
                 }
 
                 _defaultResetEvent.WaitOne(cancellationToken);
@@ -332,15 +332,15 @@ namespace AudioSwitcher.AudioApi.CoreAudio
             }
         }
 
-        public override Task<bool> SetAsDefaultAsync()
+        public override Task<bool> SetAsDefaultAsync(Role role)
         {
             var cts = new CancellationTokenSource();
             cts.CancelAfter(DefaultComTimeout);
 
-            return SetAsDefaultAsync(cts.Token);
+            return SetAsDefaultAsync(role, cts.Token);
         }
 
-        public override async Task<bool> SetAsDefaultAsync(CancellationToken cancellationToken)
+        public override async Task<bool> SetAsDefaultAsync(Role role, CancellationToken cancellationToken)
         {
             if (State != DeviceState.Active)
                 return _isDefaultDevice = false;
@@ -353,7 +353,7 @@ namespace AudioSwitcher.AudioApi.CoreAudio
                 if (acquiredSemaphore)
                 {
                     _defaultResetEvent.Reset();
-                    PolicyConfig.SetDefaultEndpoint(RealId, ERole.Console | ERole.Multimedia);
+                    PolicyConfig.SetDefaultEndpoint(RealId, (ERole)role);
                 }
 
                 await _defaultResetEvent.WaitOneAsync(cancellationToken);

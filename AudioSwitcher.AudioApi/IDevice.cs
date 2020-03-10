@@ -49,11 +49,11 @@ namespace AudioSwitcher.AudioApi
 
         IObservable<DevicePeakValueChangedArgs> PeakValueChanged { get; }
 
-        bool SetAsDefault();
-        bool SetAsDefault(CancellationToken cancellationToken);
+        bool SetAsDefault(Role role);
+        bool SetAsDefault(Role role, CancellationToken cancellationToken);
 
-        Task<bool> SetAsDefaultAsync();
-        Task<bool> SetAsDefaultAsync(CancellationToken cancellationToken);
+        Task<bool> SetAsDefaultAsync(Role role);
+        Task<bool> SetAsDefaultAsync(Role role, CancellationToken cancellationToken);
 
         bool SetAsDefaultCommunications();
         bool SetAsDefaultCommunications(CancellationToken cancellationToken);

@@ -71,19 +71,19 @@ namespace AudioSwitcher.AudioApi
 
         public virtual IObservable<DevicePeakValueChangedArgs> PeakValueChanged => _peakValueChanged.AsObservable();
 
-        public virtual bool SetAsDefault()
+        public virtual bool SetAsDefault(Role role)
         {
-            return SetAsDefault(CancellationToken.None);
+            return SetAsDefault(role, CancellationToken.None);
         }
 
-        public abstract bool SetAsDefault(CancellationToken cancellationToken);
+        public abstract bool SetAsDefault(Role role, CancellationToken cancellationToken);
 
-        public virtual Task<bool> SetAsDefaultAsync()
+        public virtual Task<bool> SetAsDefaultAsync(Role role)
         {
-            return SetAsDefaultAsync(CancellationToken.None);
+            return SetAsDefaultAsync(role, CancellationToken.None);
         }
 
-        public abstract Task<bool> SetAsDefaultAsync(CancellationToken cancellationToken);
+        public abstract Task<bool> SetAsDefaultAsync(Role role, CancellationToken cancellationToken);
 
         public virtual bool SetAsDefaultCommunications()
         {
