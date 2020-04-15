@@ -100,29 +100,34 @@ namespace AudioSwitcher.AudioApi.CoreAudio
 
         private void LoadAudioMeterInformation()
         {
-            //This should be all on the COM thread to avoid any
-            //weird lookups on the result COM object not on an STA Thread
-            ComThread.Assert();
+            if (_audioMeterInformation?.IsValueCreated == true)
+                return;
 
-            Exception ex;
-            //Need to catch here, as there is a chance that unauthorized is thrown.
-            //It's not an HR exception, but bubbles up through the .net call stack
-            try
-            {
-                var clsGuid = new Guid(ComInterfaceIds.AUDIO_METER_INFORMATION_IID);
-                object result;
-                ex = Marshal.GetExceptionForHR(Device.Activate(ref clsGuid, ClassContext.Inproc, IntPtr.Zero, out result));
-                _audioMeterInformationPtr = Marshal.GetIUnknownForObject(result);
+            _audioMeterInformation = new ThreadLocal<IAudioMeterInformation>(() => {
+                return ComThread.Invoke(() =>
+                {
+                    Exception ex;
+                    //Need to catch here, as there is a chance that unauthorized is thrown.
+                    //It's not an HR exception, but bubbles up through the .net call stack
+                    try
+                    {
+                        var clsGuid = new Guid(ComInterfaceIds.AUDIO_METER_INFORMATION_IID);
+                        object result;
+                        ex = Marshal.GetExceptionForHR(Device.Activate(ref clsGuid, ClassContext.Inproc, IntPtr.Zero, out result));
+                        if (ex != null)
+                            return null;
 
-                _audioMeterInformation = new ThreadLocal<IAudioMeterInformation>(() => Marshal.GetUniqueObjectForIUnknown(_audioMeterInformationPtr) as IAudioMeterInformation);
-            }
-            catch (Exception e)
-            {
-                ex = e;
-            }
+                        _audioMeterInformationPtr = Marshal.GetIUnknownForObject(result);
+                        return Marshal.GetUniqueObjectForIUnknown(_audioMeterInformationPtr) as IAudioMeterInformation;
+                    }
+                    catch (Exception e)
+                    {
+                        ex = e;
+                    }
 
-            if (ex != null)
-                ClearAudioMeterInformation();
+                    return null;
+                });
+            });
         }
 
         private void LoadAudioEndpointVolume()
